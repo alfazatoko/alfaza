@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#2b67f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>Alfaza Cell Pro</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="logo.png">
+    <title>Alfaza Cell - Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -20,7 +16,6 @@
     <!-- Login Screen -->
     <div id="login-screen">
         <div class="login-card">
-            <img src="logo.png" alt="Logo" style="width:80px; margin-bottom:10px;">
             <h2>ALFAZA CELL</h2>
             <p>Sistem Kasir Pro</p>
             <select id="user-name">
@@ -37,19 +32,24 @@
     <!-- Main App -->
     <div id="main-app" style="display:none">
         <div class="content">
+            <!-- Header -->
             <div class="header-card">
                 <div class="header-row">
                     <div class="shop-title">ALFAZA CELL</div>
                     <div class="live-clock" id="liveClock">--:--</div>
                 </div>
                 <div class="header-info">
-                    <span><i class="fa-regular fa-user"></i> <b id="userName">-</b></span>
+                    <span><i class="fa-regular fa-user"></i> <b id="userName">-</b> <span id="userShift"></span></span>
                     <span><i class="fa-regular fa-calendar"></i> <span id="todayDate">-</span></span>
-                    <span id="syncStatus"><i class="fa-solid fa-cloud-check"></i> Terhubung</span>
+                    <span id="syncStatus"><i class="fa-solid fa-cloud-check"></i> Ready</span>
+                </div>
+                <div class="header-info" style="margin-top: 5px; border:none; padding-top:0;">
+                    <span><i class="fa-regular fa-clock"></i> Login: <span id="loginTime">--:--</span></span>
+                    <span><i class="fa-regular fa-fingerprint"></i> Absen: <span id="attendanceTime" class="attendance-badge">--:--</span></span>
                 </div>
             </div>
 
-            <!-- Owner Panel -->
+            <!-- Owner Mode Panel -->
             <div id="ownerPanel" style="display:none;">
                 <div class="owner-header"><i class="fa-solid fa-crown"></i> MODE OWNER</div>
                 <div class="filter-buttons" id="kasirSelector">
@@ -59,27 +59,34 @@
                 </div>
             </div>
 
+            <!-- Pages -->
             <div class="two-columns">
                 <!-- Home Page -->
                 <div id="page-home" class="page active full-width">
                     <div class="saldo-grid">
-                        <div class="saldo-card blue"><div class="card-title">🏦 SALDO BANK</div><p id="saldoBank">Rp 0</p></div>
-                        <div class="saldo-card green"><div class="card-title">💵 SALDO CASH</div><p id="saldoCash">Rp 0</p></div>
+                        <div class="saldo-card blue"><div class="card-title">?? SALDO BANK</div><p id="saldoBank">Rp 0</p></div>
+                        <div class="saldo-card green"><div class="card-title">?? SALDO CASH</div><p id="saldoCash">Rp 0</p></div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><span>TARIK TUNAI</span><b id="statTarik">0</b></div>
+                        <div class="stat-card"><span>AKSESORIS</span><b id="statAks">0</b></div>
+                        <div class="stat-card"><span>ADMIN</span><b id="statAdmin">0</b></div>
                     </div>
                     <div class="action-row">
                         <button class="action-btn" onclick="openSaldoModal()"><i class="fa-solid fa-plus-circle"></i> +Saldo</button>
+                        <button class="action-btn" onclick="openSaldoRealModal()"><i class="fa-solid fa-chart-line"></i> Saldo Real</button>
                         <button class="action-btn" onclick="manualSync()"><i class="fa-solid fa-arrows-rotate"></i> Sync</button>
                     </div>
-
+                    <div class="quote-box" id="dailyQuote">Memuat kata mutiara...</div>
+                    <div class="category-grid" id="categoryGrid">
+                        <div class="category-btn active" data-cat="BANK" onclick="selectCategory('BANK', this)"><i class="fa-solid fa-building-columns"></i><span>Bank</span></div>
+                        <div class="category-btn" data-cat="FLIP" onclick="selectCategory('FLIP', this)"><i class="fa-solid fa-shuffle"></i><span>Flip</span></div>
+                        <div class="category-btn" data-cat="APP PULSA" onclick="selectCategory('APP PULSA', this)"><i class="fa-solid fa-mobile"></i><span>App</span></div>
+                        <div class="category-btn" data-cat="DANA" onclick="selectCategory('DANA', this)"><i class="fa-solid fa-wallet"></i><span>Dana</span></div>
+                        <div class="category-btn" data-cat="TARIK TUNAI" onclick="selectCategory('TARIK TUNAI', this)"><i class="fa-solid fa-hand-holding-dollar"></i><span>Tarik</span></div>
+                        <div class="category-btn" data-cat="AKSESORIS" onclick="selectCategory('AKSESORIS', this)"><i class="fa-solid fa-headset"></i><span>Aks</span></div>
+                    </div>
                     <div class="form-card">
-                        <div class="category-grid" id="categoryGrid">
-                            <div class="category-btn active" data-cat="BANK" onclick="selectCategory('BANK', this)"><i class="fa-solid fa-building-columns"></i><span>Bank</span></div>
-                            <div class="category-btn" data-cat="FLIP" onclick="selectCategory('FLIP', this)"><i class="fa-solid fa-shuffle"></i><span>Flip</span></div>
-                            <div class="category-btn" data-cat="APP PULSA" onclick="selectCategory('APP PULSA', this)"><i class="fa-solid fa-mobile"></i><span>App</span></div>
-                            <div class="category-btn" data-cat="DANA" onclick="selectCategory('DANA', this)"><i class="fa-solid fa-wallet"></i><span>Dana</span></div>
-                            <div class="category-btn" data-cat="TARIK TUNAI" onclick="selectCategory('TARIK TUNAI', this)"><i class="fa-solid fa-hand-holding-dollar"></i><span>Tarik</span></div>
-                            <div class="category-btn" data-cat="AKSESORIS" onclick="selectCategory('AKSESORIS', this)"><i class="fa-solid fa-headset"></i><span>Aks</span></div>
-                        </div>
                         <div class="input-group"><i class="fa-solid fa-money-bill"></i><input type="text" id="inputNominal" placeholder="Nominal" onkeyup="formatRupiah(this)" inputmode="numeric"></div>
                         <div class="input-group"><i class="fa-solid fa-percent"></i><input type="text" id="inputAdmin" placeholder="Admin" onkeyup="formatRupiah(this)" inputmode="numeric"></div>
                         <div class="input-group"><i class="fa-solid fa-pen"></i><input type="text" id="inputNote" placeholder="Keterangan"></div>
@@ -89,47 +96,55 @@
 
                 <!-- History Page -->
                 <div id="page-history" class="page full-width">
-                    <div class="input-group" style="margin-bottom:10px;"><i class="fa-solid fa-search"></i><input type="text" id="searchHistory" placeholder="Cari ket..." onkeyup="refreshHistory()"></div>
-                    <div class="history-container">
-                        <div class="table-responsive">
-                            <table>
-                                <thead><tr><th>Jam</th><th>Tipe</th><th>Nominal</th><th>Ket</th></tr></thead>
-                                <tbody id="historyList"></tbody>
-                            </table>
-                        </div>
+                    <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="searchHistory" placeholder="Cari keterangan..." onkeyup="refreshHistory()"></div>
+                    <div class="date-range"><input type="date" id="dateStart"><input type="date" id="dateEnd"><button onclick="refreshHistory()">Filter</button></div>
+                    <div class="filter-buttons" id="transFilter">
+                        <div class="filter-btn active" onclick="setTransFilter('all', this)">Semua</div>
+                        <div class="filter-btn" onclick="setTransFilter('BANK', this)">Bank</div>
+                        <div class="filter-btn" onclick="setTransFilter('TARIK TUNAI', this)">Tarik</div>
+                        <div class="filter-btn" onclick="setTransFilter('AKSESORIS', this)">Aks</div>
                     </div>
+                    <div class="table-responsive"><table class="history-table"><thead><tr><th>Jam</th><th>Tipe</th><th>Nominal</th><th>Admin</th><th>Ket</th><th>Aksi</th></tr></thead><tbody id="historyList"></tbody></table></div>
+                    
+                    <div style="margin-top:20px;"><div class="owner-header" style="background:#2c3e50; font-size:12px;">RIWAYAT TAMBAH SALDO</div>
+                    <div class="table-responsive"><table class="history-table"><thead><tr><th>Jam</th><th>Jenis</th><th>Nominal</th><th>Ket</th></tr></thead><tbody id="saldoHistoryList"></tbody></table></div></div>
                 </div>
 
                 <!-- Report Page -->
                 <div id="page-report" class="page full-width">
-                    <div class="input-group"><input type="date" id="reportDate" style="width:100%" onchange="showReport()"></div>
+                    <div class="date-range"><input type="date" id="reportDate"><button onclick="showReport()">Tampilkan</button></div>
                     <div id="reportArea"></div>
+                </div>
+
+                <!-- Graph Page -->
+                <div id="page-graph" class="page full-width">
+                    <div class="filter-buttons" style="justify-content:center;">
+                        <button class="filter-btn active" onclick="setGraphType('daily', this)">?? Harian</button>
+                        <button class="filter-btn" onclick="setGraphType('category', this)">?? Kategori</button>
+                    </div>
+                    <div class="date-range"><input type="date" id="graphStart"><input type="date" id="graphEnd"><button onclick="refreshGraph()">Update</button></div>
+                    <div style="background:white; border-radius:24px; padding:15px; margin-top:10px;"><canvas id="salesChart" style="max-height:250px;"></canvas></div>
                 </div>
             </div>
         </div>
 
+        <!-- NAVBAR -->
         <div class="navbar">
             <button class="nav-item active" onclick="changePage('home', this)"><i class="fa-solid fa-house"></i><span>Beranda</span></button>
             <button class="nav-item" onclick="changePage('history', this)"><i class="fa-solid fa-clock"></i><span>Riwayat</span></button>
             <button class="nav-item" onclick="changePage('report', this)"><i class="fa-solid fa-chart-pie"></i><span>Laporan</span></button>
+            <button class="nav-item" id="navGraph" onclick="changePage('graph', this)" style="display:none;"><i class="fa-solid fa-chart-line"></i><span>Grafik</span></button>
             <button class="nav-item logout" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i><span>Keluar</span></button>
         </div>
     </div>
 </div>
 
 <!-- Modals -->
-<div id="modalSaldo" class="modal">
-    <div class="modal-box">
-        <div class="modal-title">TAMBAH SALDO</div>
-        <select id="saldoType" class="modal-input"><option>Bank</option><option>Cash</option></select>
-        <input type="text" id="saldoAmount" class="modal-input" placeholder="Nominal" onkeyup="formatRupiah(this)">
-        <div class="modal-buttons">
-            <button class="modal-btn red" onclick="closeModal('modalSaldo')">Batal</button>
-            <button class="modal-btn green" onclick="saveSaldo()">Simpan</button>
-        </div>
-    </div>
-</div>
-<div id="toast">💾 Tersimpan</div>
+<div id="modalSaldo" class="modal"><div class="modal-box"><div class="modal-title">? TAMBAH SALDO</div><select id="saldoType" class="modal-input"><option>Bank</option><option>Cash</option></select><input type="text" id="saldoAmount" class="modal-input" placeholder="Nominal" onkeyup="formatRupiah(this)"><div class="modal-buttons"><button class="modal-btn red" onclick="closeModal('modalSaldo')">Batal</button><button class="modal-btn green" onclick="saveSaldo()">Simpan</button></div></div></div>
+<div id="modalSaldoReal" class="modal"><div class="modal-box"><div class="modal-title">?? SALDO REAL APP</div><input type="text" id="realAmount" class="modal-input" placeholder="Nominal" onkeyup="formatRupiah(this)"><input type="text" id="realNote" class="modal-input" placeholder="Keterangan"><div class="modal-buttons"><button class="modal-btn red" onclick="closeModal('modalSaldoReal')">Batal</button><button class="modal-btn green" onclick="saveSaldoReal()">Simpan</button></div></div></div>
+<div id="modalEdit" class="modal"><div class="modal-box"><div class="modal-title">?? EDIT TRANSAKSI</div><input type="text" id="editAmount" class="modal-input" onkeyup="formatRupiah(this)"><input type="text" id="editAdminFee" class="modal-input" onkeyup="formatRupiah(this)"><input type="text" id="editNote" class="modal-input"><div class="modal-buttons"><button class="modal-btn red" onclick="closeModal('modalEdit')">Batal</button><button class="modal-btn green" onclick="saveEdit()">Update</button></div></div></div>
+<div id="toast">?? Tersimpan</div>
+
 <script src="app.js"></script>
 </body>
 </html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#2b67f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Alfaza Cell Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<div class="app-container">
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-card">
+            <img src="logo.png" alt="Logo" style="width:80px; margin-bottom:10px;">
+            <h2>ALFAZA CELL</h2>
+            <p>Sistem Kasir Pro</p>
+            <select id="user-name">
+                <option value="KASIR 01">KASIR 01</option>
+                <option value="KASIR 02">KASIR 02</option>
+                <option value="KASIR 03">KASIR 03</option>
+                <option value="OWNER">OWNER</option>
+            </select>
+            <input type="password" id="user-pin" placeholder="PIN" inputmode="numeric">
+            <button class="btn-login" onclick="doLogin()">MASUK</button>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-app" style="display:none">
+        <div class="content">
+            <div class="header-card">
+                <div class="header-row">
+                    <div class="shop-title">ALFAZA CELL</div>
+                    <div class="live-clock" id="liveClock">--:--</div>
+                </div>
+                <div class="header-info">
+                    <span><i class="fa-regular fa-user"></i> <b id="userName">-</b></span>
+                    <span><i class="fa-regular fa-calendar"></i> <span id="todayDate">-</span></span>
+                    <span id="syncStatus"><i class="fa-solid fa-cloud-check"></i> Terhubung</span>
+                </div>
+            </div>
+
+            <!-- Owner Panel -->
+            <div id="ownerPanel" style="display:none;">
+                <div class="owner-header"><i class="fa-solid fa-crown"></i> MODE OWNER</div>
+                <div class="filter-buttons" id="kasirSelector">
+                    <div class="filter-btn active" onclick="selectKasir('KASIR 01', this)">KASIR 01</div>
+                    <div class="filter-btn" onclick="selectKasir('KASIR 02', this)">KASIR 02</div>
+                    <div class="filter-btn" onclick="selectKasir('KASIR 03', this)">KASIR 03</div>
+                </div>
+            </div>
+
+            <div class="two-columns">
+                <!-- Home Page -->
+                <div id="page-home" class="page active full-width">
+                    <div class="saldo-grid">
+                        <div class="saldo-card blue"><div class="card-title">🏦 SALDO BANK</div><p id="saldoBank">Rp 0</p></div>
+                        <div class="saldo-card green"><div class="card-title">💵 SALDO CASH</div><p id="saldoCash">Rp 0</p></div>
+                    </div>
+                    <div class="action-row">
+                        <button class="action-btn" onclick="openSaldoModal()"><i class="fa-solid fa-plus-circle"></i> +Saldo</button>
+                        <button class="action-btn" onclick="manualSync()"><i class="fa-solid fa-arrows-rotate"></i> Sync</button>
+                    </div>
+
+                    <div class="form-card">
+                        <div class="category-grid" id="categoryGrid">
+                            <div class="category-btn active" data-cat="BANK" onclick="selectCategory('BANK', this)"><i class="fa-solid fa-building-columns"></i><span>Bank</span></div>
+                            <div class="category-btn" data-cat="FLIP" onclick="selectCategory('FLIP', this)"><i class="fa-solid fa-shuffle"></i><span>Flip</span></div>
+                            <div class="category-btn" data-cat="APP PULSA" onclick="selectCategory('APP PULSA', this)"><i class="fa-solid fa-mobile"></i><span>App</span></div>
+                            <div class="category-btn" data-cat="DANA" onclick="selectCategory('DANA', this)"><i class="fa-solid fa-wallet"></i><span>Dana</span></div>
+                            <div class="category-btn" data-cat="TARIK TUNAI" onclick="selectCategory('TARIK TUNAI', this)"><i class="fa-solid fa-hand-holding-dollar"></i><span>Tarik</span></div>
+                            <div class="category-btn" data-cat="AKSESORIS" onclick="selectCategory('AKSESORIS', this)"><i class="fa-solid fa-headset"></i><span>Aks</span></div>
+                        </div>
+                        <div class="input-group"><i class="fa-solid fa-money-bill"></i><input type="text" id="inputNominal" placeholder="Nominal" onkeyup="formatRupiah(this)" inputmode="numeric"></div>
+                        <div class="input-group"><i class="fa-solid fa-percent"></i><input type="text" id="inputAdmin" placeholder="Admin" onkeyup="formatRupiah(this)" inputmode="numeric"></div>
+                        <div class="input-group"><i class="fa-solid fa-pen"></i><input type="text" id="inputNote" placeholder="Keterangan"></div>
+                        <button class="btn-save" onclick="saveTransaction()"><i class="fa-solid fa-save"></i> SIMPAN TRANSAKSI</button>
+                    </div>
+                </div>
+
+                <!-- History Page -->
+                <div id="page-history" class="page full-width">
+                    <div class="input-group" style="margin-bottom:10px;"><i class="fa-solid fa-search"></i><input type="text" id="searchHistory" placeholder="Cari ket..." onkeyup="refreshHistory()"></div>
+                    <div class="history-container">
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>Jam</th><th>Tipe</th><th>Nominal</th><th>Ket</th></tr></thead>
+                                <tbody id="historyList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Page -->
+                <div id="page-report" class="page full-width">
+                    <div class="input-group"><input type="date" id="reportDate" style="width:100%" onchange="showReport()"></div>
+                    <div id="reportArea"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navbar">
+            <button class="nav-item active" onclick="changePage('home', this)"><i class="fa-solid fa-house"></i><span>Beranda</span></button>
+            <button class="nav-item" onclick="changePage('history', this)"><i class="fa-solid fa-clock"></i><span>Riwayat</span></button>
+            <button class="nav-item" onclick="changePage('report', this)"><i class="fa-solid fa-chart-pie"></i><span>Laporan</span></button>
+            <button class="nav-item logout" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i><span>Keluar</span></button>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div id="modalSaldo" class="modal">
+    <div class="modal-box">
+        <div class="modal-title">TAMBAH SALDO</div>
+        <select id="saldoType" class="modal-input"><option>Bank</option><option>Cash</option></select>
+        <input type="text" id="saldoAmount" class="modal-input" placeholder="Nominal" onkeyup="formatRupiah(this)">
+        <div class="modal-buttons">
+            <button class="modal-btn red" onclick="closeModal('modalSaldo')">Batal</button>
+            <button class="modal-btn green" onclick="saveSaldo()">Simpan</button>
+        </div>
+    </div>
+</div>
+<div id="toast">💾 Tersimpan</div>
+<script src="app.js"></script>
+</body>
+</html>
